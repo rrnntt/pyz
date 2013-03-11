@@ -1,5 +1,5 @@
 import sympy
-from sympy import Set, Interval, FiniteSet, oo, Rational, Tuple
+from sympy import Set, Interval, FiniteSet, oo, Rational, Tuple, S
 from sympy.sets.fancysets import Reals
 
 class String(sympy.Atom):
@@ -38,3 +38,11 @@ print hello + ' ' + Rational(3,4)
 t = Tuple(hello, f)
 print t
 print t[0]
+
+Doubles = Interval(-1e300,1e300)
+print Doubles
+v = S(1e300)
+print type(v),v,Doubles.contains(v)
+
+print Doubles * Doubles
+
