@@ -1,4 +1,5 @@
 import sympy
+import defaults
 
 class Type(object):
     def __init__(self, const):
@@ -7,14 +8,18 @@ class Type(object):
     def _combine_const(self, other):
         return self.const or other.const
         
-default_const = False
+class DivisionByZero(Exception):
+    pass
+
+class DoubleOverflow(Exception):
+    pass
+
+class DoubleUnderflow(Exception):
+    pass
 
 class Double(Type):
     
-    dmin = -1e300
-    dmax = 1e300
-    
-    def __init__(self, start = -1e300, end = 1e300, const = default_const):
+    def __init__(self, start = -1e300, end = 1e300, const = defaults.const):
         Type.__init__(self, const)
         if isinstance( start, sympy.Set ):
             self.domain = start
@@ -28,13 +33,8 @@ class Double(Type):
         return  out + ')'
     
     def _check_overflow(self, dom ):
-        if isinstance( dom, sympy.Interval ):
-            if dom.start <= self.dmin:
-                raise Exception('Double negative overflow')
-            if dom.end >= self.dmax:
-                raise Exception('Double positive overflow')
-        else:
-            raise Exception("Domain incompatible with Double: " + str(dom))
+        if defaults.DoublesInterval | dom != defaults.DoublesInterval:
+            raise DoubleOverflow('Double negative overflow')
         
     def _add_intervals(self, ival1, ival2):
         """Return domain of addition of two doubles lying in intervals ival1 and ival2."""
@@ -48,6 +48,30 @@ class Double(Type):
         """Return domain of subtraction of two doubles lying in intervals ival1 and ival2."""
         start = ival1.start - ival2.end
         end = ival1.end - ival2.start
+        ival = sympy.Interval(start, end)
+        self._check_overflow( ival )
+        return ival
+    
+    def _mul_intervals(self, ival1, ival2):
+        """Return domain of multiplication of two doubles lying in intervals ival1 and ival2."""
+        start = ival1.start * ival2.start
+        end = ival1.end * ival2.end
+        ival = sympy.Interval(start, end)
+        self._check_overflow( ival )
+        return ival
+    
+    def _div_intervals(self, ival1, ival2):
+        """Return domain of division of two doubles lying in intervals ival1 and ival2."""
+        if ival2.contains(0):
+            raise DivisionByZero()
+        # rubbish
+        bounds = [ival1.start / ival2.start,
+                  ival1.start / ival2.end,
+                  ival1.end / ival2.start,
+                  ival1.end / ival2.end
+                  ]
+        start = min(bounds)
+        end = max(bounds)
         ival = sympy.Interval(start, end)
         self._check_overflow( ival )
         return ival
@@ -77,6 +101,9 @@ class Double(Type):
     
     def __sub__(self, other):
         return self._bin_operation(other, self._sub_intervals)
+    
+    def __mul__(self, other):
+        return self._bin_operation(other, self._mul_intervals)
     
     def __or__(self, other):
         dom = self.domain | other.domain

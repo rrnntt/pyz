@@ -1,4 +1,5 @@
 import unittest
+import defaults
 from Types import *
 
 class TestTypes(unittest.TestCase):
@@ -39,14 +40,16 @@ class TestTypes(unittest.TestCase):
         self.assertTrue(isinstance(dom, sympy.Union))
         self.assertEqual( str(dom), '[1, 2] U [10, 11]')
         dd = d + d1
-        print dd
         self.assertEqual( str(dd.domain), '[2, 4] U [11, 13]')
         dd = d - d1
-        print dd
         self.assertEqual( str(dd.domain), '[-1, 1] U [8, 10]')
         d -= d1
-        print d
-        #self.assertEqual( str(dd.domain), '[-1, 1] U [8, 10]')
+        self.assertEqual( str(dd.domain), '[-1, 1] U [8, 10]')
+        
+    def test_Double_division(self):
+        
+        print  defaults.const
+        print defaults.DoublesInterval | sympy.Interval(1,2) == defaults.DoublesInterval
         
 
     
