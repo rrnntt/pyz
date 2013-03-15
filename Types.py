@@ -17,6 +17,10 @@ class DoubleOverflow(Exception):
 class DoubleUnderflow(Exception):
     pass
 
+class IncompatibleType(Exception):
+    def __init__(self, mess):
+        Exception.__init__(self, mess)
+
 def get_bounds( dom ):
     """Get a list of all interval bounds that can be found in dom"""
     bounds = []
@@ -24,8 +28,8 @@ def get_bounds( dom ):
         for d in dom.args:
             bounds += get_bounds(d)
     elif isinstance( dom, sympy.Interval ):
-        bounds.append( dom.start )
-        bounds.append( dom.end )
+        bounds.append( dom.inf )
+        bounds.append( dom.sup )
     return bounds
     
 
@@ -54,24 +58,24 @@ class Double(Type):
         
     def _add_intervals(self, ival1, ival2):
         """Return domain of addition of two doubles lying in intervals ival1 and ival2."""
-        start = ival1.start + ival2.start
-        end = ival1.end + ival2.end
+        start = ival1.inf + ival2.inf
+        end = ival1.sup + ival2.sup
         ival = sympy.Interval(start, end)
         self._check_overflow( ival )
         return ival
     
     def _sub_intervals(self, ival1, ival2):
         """Return domain of subtraction of two doubles lying in intervals ival1 and ival2."""
-        start = ival1.start - ival2.end
-        end = ival1.end - ival2.start
+        start = ival1.inf - ival2.sup
+        end = ival1.sup - ival2.inf
         ival = sympy.Interval(start, end)
         self._check_overflow( ival )
         return ival
     
     def _mul_intervals(self, ival1, ival2):
         """Return domain of multiplication of two doubles lying in intervals ival1 and ival2."""
-        start = ival1.start * ival2.start
-        end = ival1.end * ival2.end
+        start = ival1.inf * ival2.inf
+        end = ival1.sup * ival2.sup
         ival = sympy.Interval(start, end)
         self._check_overflow( ival )
         return ival
@@ -84,10 +88,10 @@ class Double(Type):
             raise DivisionByZero()
         # because we checked for underflow ival2 excludes the area around the zero 
         # and it is not a union because ival2 is an interval
-        bounds = [ival1.start / ival2.start,
-                  ival1.start / ival2.end,
-                  ival1.end / ival2.start,
-                  ival1.end / ival2.end
+        bounds = [ival1.inf / ival2.inf,
+                  ival1.inf / ival2.sup,
+                  ival1.sup / ival2.inf,
+                  ival1.sup / ival2.sup
                   ]
         start = min(bounds)
         end = max(bounds)
@@ -100,8 +104,8 @@ class Double(Type):
         """Return domain of power of two doubles lying in intervals ival1 and ival2."""
         if (sympy.Interval(-sympy.oo, 0) | defaults.DoublesUndeflowInterval) & ival1 != sympy.EmptySet(): 
             raise DoubleUnderflow()
-        start = ival1.start ** ival2.start
-        end = ival1.end ** ival2.end
+        start = ival1.inf ** ival2.inf
+        end = ival1.sup ** ival2.sup
         if start < end:
             ival = sympy.Interval(start, end)
         else:
@@ -149,3 +153,10 @@ class Double(Type):
         dom = self.domain | other.domain
         return Double( dom )
     
+    def make_var(self, obj):
+        if isinstance(obj,int) or isinstance(obj,float) or isinstance(obj, sympy.Number):
+            return sympy.Float(obj), Double(obj,obj, const = True)
+        elif isinstance(obj,sympy.Basic):
+            return self.make_var(obj.evalf())
+        raise IncompatibleType('Double and ' + str(type(obj)))
+        
