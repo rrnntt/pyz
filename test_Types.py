@@ -20,14 +20,13 @@ class TestTypes(unittest.TestCase):
         dom = dt.domain
         self.assertTrue(isinstance(dom, sympy.Union))
         
-        x = sympy.Symbol('x')
-        y = eval('1+2*x')
-        print type(x),y.args,str(x)
+#        x = sympy.Symbol('x')
+#        y = eval('1+2*x')
+#        print type(x),y.args,str(x)
         
         d1 = Double(1,2)
         d2 = Double(3,4)
         d = d1 + d2
-        print d
         self.assertTrue(isinstance(d.domain, sympy.Interval))
         self.assertEqual(d.domain.start, 4)
         self.assertEqual(d.domain.end, 6)
@@ -46,10 +45,38 @@ class TestTypes(unittest.TestCase):
         d -= d1
         self.assertEqual( str(dd.domain), '[-1, 1] U [8, 10]')
         
+    def test_get_bounds(self):
+        dom = sympy.Interval(1,2).union(sympy.Interval(3,4))
+        bounds = get_bounds(dom)
+        self.assertEqual( bounds, [1,2,3,4] )
+        dom = sympy.Interval(1,2).union(sympy.Interval(3,4).union(sympy.Interval(10,11)))
+        bounds = get_bounds(dom)
+        self.assertEqual( bounds, [1, 2, 3, 4, 10, 11] )
+        
     def test_Double_division(self):
         
-        print  defaults.const
-        print defaults.DoublesInterval | sympy.Interval(1,2) == defaults.DoublesInterval
-        
+        d1 = Double(1,2)
+        d2 = Double(3,4)
+        d = d1 / d2
+        self.assertEqual( str(d.domain), '[1/4, 2/3]')
 
-    
+        d1 = Double(-1,2)
+        d2 = Double(-4, -3)
+        d = d1 / d2
+        self.assertEqual( str(d.domain), '[-2/3, 1/3]')
+
+        d1 = Double(1,2)
+        d2 = Double(-1,1)
+        self.assertRaises( DivisionByZero, lambda : d1 / d2 )
+        
+    def test_Double_pow(self):
+        
+        d1 = Double(1,2)
+        d2 = Double(3,4)
+        d = d1 ** d2
+        self.assertEqual( str(d.domain), '[1, 16]')
+
+        d1 = Double(0,200)
+        d2 = Double(0,4)
+        self.assertRaises( DoubleUnderflow, lambda : d1 ** d2 )
+        
