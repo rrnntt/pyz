@@ -125,13 +125,13 @@ class TestVariable(unittest.TestCase):
         self.assertEqual( str(d), 'temp: y**0.5')
         self.assertEqual( type(d), Variable )
         self.assertTrue( isinstance(d.var, sympy.Basic ) )
-        self.assertEqual( str(d.typ), 'Double([sqrt(3), 2])')
+        self.assertTrue( str(d.typ) == 'Double([sqrt(3), 2])' or str(d.typ) == 'Double([3**(1/2), 2])' )
 
         d = Y ** (-0.3)
-        self.assertEqual( str(d), 'temp: y**(-0.3)')
+        self.assertTrue( str(d)=='temp: y**(-0.3)' or str(d)=='temp: y**-0.3')
         self.assertEqual( type(d), Variable )
         self.assertTrue( isinstance(d.var, sympy.Basic ) )
-        self.assertEqual( str(d.typ), 'Double([4**(-0.3), 3**(-0.3)])')
+        self.assertTrue( str(d.typ)=='Double([4**(-0.3), 3**(-0.3)])' or str(d.typ)=='Double([4**-0.3, 3**-0.3])')
 
         d = (1.5) ** Y
         self.assertEqual( str(d), 'temp: 1.5**y')

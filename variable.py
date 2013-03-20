@@ -17,9 +17,9 @@ class Variable(NamedObject):
             self.var = namespace
             self.typ = name
         else:
-            NamedObject.__init__(self, name, namespace)
             self.var = sympy.Symbol( name )
             self.typ = typ
+            NamedObject.__init__(self, name, namespace)
 
     def __str__(self):
         if self.name != None:

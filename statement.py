@@ -7,7 +7,7 @@ class Statement(object):
         self.namespace = namespace
         
     def run(self):
-        pass
+        self._run()
     
 class Assignment(Statement):
     
@@ -20,6 +20,14 @@ class Assignment(Statement):
         self.var = var
         self.expr = expr 
         
-    def run(self):
+    def _run(self):
         self.var.typ = self.expr.typ
+        
+class IfStatement(Statement):
+    def __init__(self, namespace, clauses):
+        Statement.__init__(self, namespace)
+        self.clauses = clauses
+        
+    def _run(self):
+        pass
         

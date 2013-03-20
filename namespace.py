@@ -1,5 +1,9 @@
+
 class NameExists(Exception):
     pass
+
+def isVariable(obj):
+    return hasattr(obj,'var')
 
 class NamedObject(object):
     def __init__(self, name, namespace = None):
@@ -23,9 +27,14 @@ class Namespace(NamedObject):
     def add_name(self, name, obj):
         if name in self.names:
             raise NameExists("Name " + name + " already exists in namespace " + self.full_name())
-        self.names[name] = obj
+        if isVariable(obj):
+            self.names[name] = obj.var
+        else:
+            self.names[name] = obj
         
     def contains(self, obj):
+        if isVariable(obj):
+            return obj.var in self.names.itervalues()
         return obj in self.names.itervalues()
         
     def __iter__(self):

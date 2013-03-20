@@ -1,8 +1,9 @@
 import unittest
-from expression import *
+from statement import *
+import copy
 
 
-class TestExpression(unittest.TestCase):
+class TestStatement(unittest.TestCase):
     
     def test_assignment(self):
         ns = None
@@ -17,4 +18,19 @@ class TestExpression(unittest.TestCase):
         Assignment(ns, y, 2*y).run()
         self.assertEqual( str(x), 'var x: Double([1, 2])' )
         self.assertEqual( str(y), 'var y: Double([2, 4])' )
+        
+    def test_logic(self):
+        x = sympy.Symbol('x')
+        rel = x > 0
+        print rel.subs(x,1), type(rel)
+        
+    def test_copy(self):
+        ns = Namespace('')
+        y = Variable(ns, 'y', Double(1,2))
+        y1 = copy.copy(y)
+        y1.typ = Double(3,4)
+        print y, ns.contains(y)
+        print y1, ns.contains(y1)
+        print hasattr(y,'var'), y == y1
+        
         
