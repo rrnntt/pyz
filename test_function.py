@@ -10,4 +10,11 @@ class TestFunction(unittest.TestCase):
         self.assertRaises(NameExists, lambda : ns.add_name('local','other stuff'))
         
     def test_function(self):
-        
+        pass
+    
+    def test_logic(self):
+        x = sympy.Symbol('x')
+        rel = x > 0
+        print type(rel)
+        print type( rel.subs(x,1) ), isinstance( rel, relational.Relational ) 
+    

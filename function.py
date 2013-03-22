@@ -1,4 +1,5 @@
 import sympy
+from sympy.core import relational
 from namespace import *
 from variable import *
 from context import *
@@ -10,6 +11,7 @@ class Function(NamedObject):
         self.args = []
         self.ret = None
         self.local_namespace = Namespace(self.name)
+        self.post_cond = True 
     
     def arg(self, name, typ, value = None):
         """Declare a function argument.
@@ -24,3 +26,8 @@ class Function(NamedObject):
         
     def retType(self, typ):
         self.ret = typ
+
+    def post(self, cond):
+        if isinstance(cond,bool) or isinstance( cond, relational.Relational ):
+            self.post_cond = cond
+        
