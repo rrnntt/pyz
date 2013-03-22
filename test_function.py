@@ -9,3 +9,5 @@ class TestFunction(unittest.TestCase):
         self.assertTrue('local' in ns)
         self.assertRaises(NameExists, lambda : ns.add_name('local','other stuff'))
         
+    def test_function(self):
+        
