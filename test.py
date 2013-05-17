@@ -1,5 +1,5 @@
 import sympy
-from sympy import Set, Interval, FiniteSet, oo, Rational, Tuple, S
+from sympy import Set, Interval, FiniteSet, oo, Rational, Tuple, S, Symbol, sin
 from sympy.sets.fancysets import Reals
 
 class String(sympy.Atom):
@@ -46,3 +46,13 @@ print type(v),v,Doubles.contains(v)
 
 print Doubles * Doubles
 
+x = Symbol('x', real = True, bounded = True)
+
+print ( Interval(x+2,100) | Interval(x+3,100) ).contains(x+4.0) & (x < 90)
+print Interval(x+4.0,100) & Interval(x+3,100)
+
+print x.is_bounded
+
+print Interval(sin(x),100)
+
+print (x < 1) & (x > 0)
