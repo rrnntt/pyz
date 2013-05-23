@@ -1,8 +1,7 @@
-import sympy
 from sympy.core import relational
-from namespace import *
-from variable import *
-from context import *
+from namespace import NamedObject, Namespace
+from variable import Variable
+#from context import *
 
 class Function(NamedObject):
     
@@ -12,6 +11,16 @@ class Function(NamedObject):
         self.ret = None
         self.local_namespace = Namespace(self.name)
         self.post_cond = True 
+        
+    def declare(self):
+        pass
+    
+    def define(self):
+        pass
+    
+    def run(self, context):
+        
+        pass
     
     def arg(self, name, typ, value = None):
         """Declare a function argument.

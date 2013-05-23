@@ -1,6 +1,6 @@
 import sympy
-from namespace import *
-from Types import *
+from namespace import NamedObject
+#from Types import *
 
 class Variable(NamedObject):
     def __init__(self, namespace, name, typ = None, value = None):

@@ -44,7 +44,8 @@ print Doubles
 v = S(1e300)
 print type(v),v,Doubles.contains(v)
 
-print Doubles * Doubles
+print type(Doubles * Doubles)
+
 
 x = Symbol('x', real = True, bounded = True)
 
@@ -56,3 +57,11 @@ print x.is_bounded
 print Interval(sin(x),100)
 
 print (x < 1) & (x > 0)
+
+x = sympy.Symbol('x')
+y = sympy.Symbol('y')
+
+print 2*x == x + x
+
+print hello.is_String
+

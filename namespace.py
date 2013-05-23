@@ -1,16 +1,42 @@
+import re
 
 class NameExists(Exception):
+    pass
+
+class EmptyName(Exception):
+    pass
+
+class InvalidName(Exception):
     pass
 
 def isVariable(obj):
     return hasattr(obj,'var')
 
+name_pattern = re.compile('[a-zA-Z]\w*')
+def validate_name(name):
+    if not re.match( name_pattern, name ):
+        raise InvalidName( 'Invalid object name ' + name )
+
 class NamedObject(object):
+    """Any object with a name.
+    
+    Args:
+        name (str): objects name. Cannot be empty.
+        namespace (Namespace): If namespace is given this object will be attached to that namespace. 
+    """
     def __init__(self, name, namespace = None):
-        self.name = name
-        if namespace != None:
-            namespace.add_name( name, self )
-        self.namespace = namespace
+        if name == None:
+            self.name = None
+            self.namespace = None
+        else:
+            # name cannot be empty
+            if name == '':
+                raise EmptyName( "NamedObject must have a non-empty name." )
+            validate_name(name)
+            self.name = name
+            if namespace != None:
+                namespace.add_name( name, self )
+            self.namespace = namespace
 
     def full_name(self):
         """Fully qualified namespace name."""
@@ -20,6 +46,7 @@ class NamedObject(object):
             return self.name
         
 class Namespace(NamedObject):
+    """A collection of named objects."""
     def __init__(self, name, namespace = None):
         NamedObject.__init__(self, name, namespace)
         self.names = {}

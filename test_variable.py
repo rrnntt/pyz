@@ -1,5 +1,7 @@
 import unittest
-from variable import *
+import sympy
+from variable import Variable
+from Types import Double, DoubleUnderflow
 
 def getit(i):
     return sympy.Rational(i,3)

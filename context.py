@@ -1,4 +1,4 @@
-from namespace import *
+#from namespace import *
 
 class Context(object):
     def __init__(self, namespace):
